@@ -1,0 +1,37 @@
+{
+  "name": "nft-mint-frontend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@alch/alchemy-web3": "^1.4.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@perawallet/connect": "^1.3.3",
+    "@pinata/sdk": "^2.1.0",
+    "@randlabs/myalgo-connect": "^1.4.2",
+    "alchemy-sdk": "^2.6.2",
+    "algosdk": "^2.2.0",
+    "axios": "^1.3.4",
+    "bn.js": "^5.2.1",
+    "buffer": "^6.0.3",
+    "near-api-js": "^2.0.4",
+    "pinia": "^2.0.32",
+    "pinia-plugin-persistedstate": "^3.1.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "stream-browserify": "^3.0.0",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6",
+    "vue3-toastify": "^0.1.11",
+    "vuetify": "^3.1.11",
+    "web3": "^1.9.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "rollup-plugin-inject": "^3.0.2",
+    "vite": "^4.1.4"
+  }
+}
