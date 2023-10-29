@@ -4,12 +4,15 @@ import axios from '../plugins/axios';
 import { ref } from 'vue';
 import { useDisplay } from 'vuetify'
 import BadgeDetailsDialog from '../components/BadgeDetailsDialog.vue';
-import SendBadgeDialog from '../components/SendBadgeDialog.vue';
+import SendBadgeDialog from '../components/sendbadgedialog.vue';
 import CreateBadgeDialog from '../components/CreateBadgeDialog.vue';
 import { watch } from 'vue';
 import GeneralBlockchainService from '../services/GeneralBlockchainService'
 import { useRoute } from 'vue-router';
 import router from '../router';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 const route = useRoute()
 
 const display = useDisplay()
@@ -39,33 +42,41 @@ onMounted(() => {
     })
     .catch(e => {
         loading.value=false
+        toast("An error has occured while fetching blockchains. Try refreshing the page.", {autoClose: 2000, type: 'error'})
     })
 })
 
 const refreshBadges = async () => {
     loading.value = true;
+    
     let account = await GeneralBlockchainService.getAccount(selectedBlockchain.value)
-    let assets = await GeneralBlockchainService.getAllAssets(selectedBlockchain.value)
-    console.log(assets)
-    axios.post('/api/badges/refresh?page=' + currentPage.value, {'blockchain_id': selectedBlockchain.value.id, 'assets': assets, 'original_address': account})
-    .then(response => {
-        console.log(response)
-        console.log(badges.value)
-        badges.value = response.data.badges.data
-        badges.value.forEach((element) => element.properties = JSON.parse(element.properties))
-        totalPages.value = response.data.badges.last_page
-        loading.value = false
-    })    
+    let existingAssets = await axios.get('/api/badge-ids/' + selectedBlockchain.value.id)
+    
+    GeneralBlockchainService.getAllAssets(selectedBlockchain.value, existingAssets.data.badges)
+    .then(assets => {
+        axios.post('/api/badges/refresh?page=' + currentPage.value, {'blockchain_id': selectedBlockchain.value.id, 'assets': assets, 'original_address': account})
+        .then(response => {
+            badges.value = response.data.badges.data
+            badges.value.forEach((element) => element.properties = JSON.parse(element.properties))
+            totalPages.value = response.data.badges.last_page
+            loading.value = false
+        })    
+        .catch(e => {
+            console.log(e)
+            loading.value = false
+            toast("An error has occured while refreshing assets", {autoClose: 2000, type: 'error'})
+        })
+    })
     .catch(e => {
         console.log(e)
         loading.value = false
-    })
+        toast("An error has occured while fetching asset data from blockchain", {autoClose: 2000, type: 'error'})
+    })    
 }
 
 const connect = async () => {
     await GeneralBlockchainService.login(selectedBlockchain.value)
     let isSignedIn = await GeneralBlockchainService.isSignedIn(selectedBlockchain.value)
-    console.log(isSignedIn)
     isWalletConnected.value = isSignedIn
     getBadges()
 }
@@ -76,14 +87,14 @@ const getBadges = async () => {
     loading.value=true
     axios.get('/api/badges/' + selectedBlockchain.value.id + '?page=' + currentPage.value) 
     .then(response => {
-        console.log(response)
         badges.value = response.data.badges.data
         badges.value.forEach((element) => element.properties = JSON.parse(element.properties))
         totalPages.value = response.data.badges.last_page
         loading.value=false
     })
     .catch(e => {
-        console.log(e)    
+        console.log(e)
+        toast("An error has occured while fetching badges", {autoClose: 2000, type: 'error'})
         loading.value=false
     })
 }
@@ -95,13 +106,9 @@ const updateSentToAddress = (val) => {
         }
     });
 }
-//let api = await window.cardano.nami.enable()
-//console.log(api)
-//console.log(await api.getUsedAddresses())
+
 watch(selectedBlockchain, async (newVal, oldVal) => {
-    console.log(selectedBlockchain.value)
     if(!oldVal) return
-    console.log(newVal)
     router.push({name: 'badgeGrid', query: {blockchain: newVal.code}})
 })
 
@@ -115,10 +122,7 @@ watch(route, async (newVal, oldVal) => {
     if(!newVal.query.blockchain) return 
     currentPage.value = 1
     getBadges({code: newVal.query.blockchain})
-
-// // //    if(newVal.code === 'CARDANO') GeneralBlockchainService.mintAsset(newVal, {})
 })
-
 </script>
 
 <template>
@@ -168,19 +172,22 @@ watch(route, async (newVal, oldVal) => {
         <v-row>
             <v-col v-for="badge in badges" :key="badge" class="d-flex child-flex" cols="12" xs="12" sm="12" md="6" lg="3">
                 <div class="container"> 
-                    <v-img :src="badge.img_path" aspect-ratio="1" cover
-                        class="bg-grey-lighten-2 image" @click="isDetailsDialogVisible=true; detailsData=badge">
-                        <template v-slot:placeholder>
-                            <v-row class="fill-height ma-0" align="center" justify="center">
-                                <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
-                            </v-row>
-                        </template>
-                    </v-img>
-                    <v-btn v-if="!badge.sent_to_address" class="btn" color="blue" icon="mdi-send" @click="isSendDialogVisible=true; dataForSend=badge">
-                    </v-btn>
-                    <div class="overlay" @click="isDetailsDialogVisible=true; detailsData=badge">
-                        <div class="text">{{ badge.name }}</div>
-                    </div>           
+                    <div class="d-flex justify-space-between">
+                        <p class="text-h6 text-medium-emphasis">{{ badge.name }}</p>
+                        <p class="text-h6 text-medium-emphasis">{{ badge.badge_created_at }}</p>
+                    </div>
+                    <div>
+                        <v-img :src="badge.local_img_path ? badge.local_img_path : badge.img_path" aspect-ratio="1" cover
+                            class="bg-grey-lighten-2 image" @click="detailsData=badge; isDetailsDialogVisible=true;">
+                            <template v-slot:placeholder>
+                                <v-row class="fill-height ma-0" align="center" justify="center">
+                                    <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
+                                </v-row>
+                            </template>
+                        </v-img>
+                        <v-btn v-if="!badge.sent_to_address" class="btn" color="blue" icon="mdi-send" @click="isSendDialogVisible=true; dataForSend=badge">
+                        </v-btn>
+                    </div>
                 </div>
             </v-col>
         </v-row>

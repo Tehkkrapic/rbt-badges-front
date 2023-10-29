@@ -31,7 +31,6 @@ export default {
           */
          
           
-        console.log(axios.defaults.headers)
         /*
         axios.get('http://cardano-testnet.tangocrypto.com/fbc8dfbe8d14435bba35c906ab9d793b/v1/blocks/latest', {headers: {'x-api-key': '5886e6a5ca624441b8f2f5289f753116'}})
         .then(response => {

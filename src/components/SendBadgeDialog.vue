@@ -6,6 +6,7 @@ import axios from '../plugins/axios';
 import GeneralBlockchainService from '../services/GeneralBlockchainService';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { nextTick } from 'process';
 
 const props = defineProps({
     isDialogVisible: {
@@ -28,23 +29,26 @@ const address = ref()
 const emit = defineEmits(['update:isDialogVisible', 'update:sentToAddress'])
 
 const closeDialog = () => {
-    address.value = null
-    loading.value = false
     emit('update:isDialogVisible', false)
+    nextTick(() => {
+        refForm.value.reset()
+        refForm.value.resetValidation()
+    })
 }
 
 const handleDialogModelValueUpdate = val => {
-    address.value = null
-    loading.value = false
-
     emit('update:isDialogVisible', val)
+    nextTick(() => {
+        refForm.value.reset()
+        refForm.value.resetValidation()
+    })
 }
 
 const transferBadge = async () => {
-    if(!address.value) return
     loading.value = true
-    let value = await GeneralBlockchainService.sendAsset(props.blockchain, {to: address.value, tokenID: props.badgeData.token_id})
-    if(value) {
+
+    GeneralBlockchainService.sendAsset(props.blockchain, {to: address.value, tokenID: props.badgeData.token_id})
+    .then(res => {
         axios.put('/api/badges/sentToAddress/' + props.badgeData.id, {sent_to_address: address.value})
         .then(res => {
             emit('update:sentToAddress', {sent_to_address: address.value, id: props.badgeData.id})
@@ -53,13 +57,18 @@ const transferBadge = async () => {
             closeDialog()
         })
         .catch(e => {
+            console.log(e)
+            toast("An error has occured while sending the asset", {autoClose: 2000, type: 'error'})
             loading.value = false
             closeDialog()
         })
-    } else {
+    })
+    .catch(e => {
+        console.log(e)
         loading.value = false
-        closeDialog()
-    }
+        toast("An error has occured while sending the asset", {autoClose: 2000, type: 'error'})   
+        closeDialog() 
+    })
 }
 
 const addressRules = [

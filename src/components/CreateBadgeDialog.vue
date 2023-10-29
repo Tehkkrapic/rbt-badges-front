@@ -56,7 +56,7 @@ const descRules = [
 
 const amountRules = [
     v => !!v || 'Amount is required',
-    v => (v && v < 20) || 'Amount must be less than 20',
+    v => (v && v < 20) || 'Amount must be less than 15',
 ]
 
 
@@ -83,58 +83,28 @@ const createBadge = () => {
         'properties': JSON.stringify(properties.value)
     }
     axios.post('/api/badges', badge, {headers: {'Content-Type': 'multipart/form-data'}})
-    .then(async response => {
-        console.log(response)
-        GeneralBlockchainService.mintAsset(props.currentBlockchain, response.data, badge)
-    .then(res => {
-        toast("Badge created successfully. It might take a while for it to be processed. Refresh after a while.", {autoClose: 2000, type: 'success'})
-        loading.value = false
-        closeDialog();
-    });
-    })
-    .catch(e => {
-        console.log(e)
-        loading.value = false
+    .then(response => {
+        if(response.status === 200) {            
+            GeneralBlockchainService.mintAsset(props.currentBlockchain, response.data, badge)
+            .then(res => {
+                console.log(res)
+                toast("Badge created successfully. It might take a while for it to be processed. Refresh after a while.", {autoClose: 2000, type: 'success'})
+                loading.value = false
+                closeDialog();
+            })
+            .catch(e => {
+                console.log(e)
+                toast("There was an error while creating a badge", {autoClose: 2000, type: 'error'})
+                loading.value = false   
+            }) 
+        } else {
+            console.log(response)
+            toast("There was an error while uploading data to IPFS", {autoClose: 2000, type: 'error'})
+            loading.value = false   
+        }
     })
 }
 
-/*
-const t = () => {
-    FileUtils.writeFile('./images/', file.name, file.data).then(() => {
-        PinataUtils.pinFile(file.name).then(result => {
-                console.log(result);
-                var metaData = {
-                    "name": body['name'],
-                    "description": body['description'],
-                    "image": "https://gateway.pinata.cloud/ipfs/" + result['IpfsHash'],
-                    "properties": properties
-                }
-                console.log(metaData);
-                FileUtils.writeFile('./metadata/', FileUtils.getFileNameWithoutExtension(file.name) + '_metadata.json', JSON.stringify(metaData)).then(() => {
-                    let metadata = undefined;
-                    PinataUtils.pinMetadata(file.name, metaData).then(metaDataResult => {
-                        console.log(metaDataResult);
-                        fs.readFile('./metadata/' + FileUtils.getFileNameWithoutExtension(file.name) + '_metadata.json', (err, data) => {
-                            if (err) {
-                                throw err;
-                            }
-                            console.log(data);
-                            metadata = data;
-                            const hash = crypto.createHash('sha256');
-                            hash.update(metadata);
-                            let assetMetadataHash = new Uint8Array(hash.digest());
-                            res.send({
-                                metaData: metaData,
-                                metaDataResult: metaDataResult,
-                                assetMetadataHash: assetMetadataHash
-                            });
-                        });
-                    });            
-                });                
-            });
-}
-
-*/
 const isValid = ref(false)
 const onSubmit = () => {
     refForm.value

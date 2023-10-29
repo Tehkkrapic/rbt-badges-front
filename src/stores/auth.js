@@ -18,7 +18,6 @@ export const useAuthStore = defineStore('auth', {
             axios
                 .get('/sanctum/csrf-cookie')
                 .then(response => {
-                    console.log("CORS")
                 })
                 .catch(e => {
                     console.log(e)
@@ -33,13 +32,11 @@ export const useAuthStore = defineStore('auth', {
             await this.getCorsToken()
             return axios.post('/login', {email, password})
             .then(async res => {
-                console.log(res)                
+                if(res && res.response && res.response.status === 422) {
+                    toast("An error has occured while signing into the website", {autoClose: 2000, type: 'error'})
+                    return
+                }
                 await this.setCurrentUser()
-                console.log(this.currentUser)    
-            })
-            .catch(e => {
-                toast.info(e.response.data.message, {autoClose: 2000})
-                throw e
             })
         },
 

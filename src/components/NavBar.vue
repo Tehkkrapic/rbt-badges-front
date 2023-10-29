@@ -58,8 +58,10 @@ const logout = () => {
 
         <v-list density="compact" nav>
           <v-list-item prepend-icon="mdi-home" title="Home" :to="{name: 'badgeGrid', params: {blockchain: 'ETHEREUM'}}"></v-list-item>
+          <!--
           <v-list-item prepend-icon="mdi-account" title="Administrators" value="administrators" to="/administrators"></v-list-item>
           <v-list-item prepend-icon="mdi-view-list" title="Blockchains" value="blockchains" to="/blockchains"></v-list-item>
+          -->
           <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout" @click="logout"></v-list-item>
         </v-list>
       </v-navigation-drawer>

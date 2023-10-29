@@ -16,8 +16,8 @@ export default {
     return await this.getService(blockchain.code).getAccount()
   },
 
-  async getAllAssets(blockchain) {
-    return await this.getService(blockchain.code).getAllAssets({})
+  async getAllAssets(blockchain, existingAssets) {
+    return await this.getService(blockchain.code).getAllAssets({existingAssets})
   },
 
   logout() {},

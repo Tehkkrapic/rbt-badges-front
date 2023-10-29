@@ -21,7 +21,6 @@ const closeDialog = () => {
 const handleDialogModelValueUpdate = val => {
   emit('update:isDialogVisible', val)
 }
-
 </script>
 
 <template>
@@ -33,7 +32,7 @@ const handleDialogModelValueUpdate = val => {
                 <v-img
                     class="mt-3"
                     height="400"
-                    :src="props.badgeData.img_path"
+                    :src="props.badgeData.local_img_path ? props.badgeData.local_img_path : props.badgeData.img_path"
                     cover
                 />
             <VDivider></VDivider>

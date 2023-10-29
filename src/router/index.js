@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
-import HomeView from '../views/HomeView.vue'
 import BadgeGridView from '../views/BadgeGridView.vue'
 import AdministratorsView from '../views/AdministratorsView.vue'
 import BlockchainsView from '../views/BlockchainsView.vue'
@@ -15,11 +14,6 @@ const router = createRouter({
       component: BadgeGridView
     },
     {
-      path: '/home',
-      name: 'home',
-      component: HomeView
-    },
-    {
       path: '/blockchains:/',
       name: 'blockchains',
       component: BlockchainsView
@@ -32,15 +26,10 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: Login
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      component: Login,
+      meta: {
+        hideNavbar: true
+      }
     },
     {
       path: '/register',
@@ -53,8 +42,8 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   let currentUser = JSON.parse(localStorage.getItem('auth')) && JSON.parse(localStorage.getItem('auth')).currentUser;
   if(!currentUser && (to.name !== 'login' && to.name !== 'register')) {
-    console.log("TUUU")
     localStorage.clear()
+    sessionStorage.clear()
     return {name: 'login'}
   }
   if(currentUser && (to.name === 'login' || to.name === 'register')) return {name: 'badgeGrid'}

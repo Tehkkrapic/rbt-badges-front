@@ -45,19 +45,18 @@ const login = () => {
     authStore.login(email.value, password.value)
     .then(res => {
         loading.value = false
-//        toast("Sign in successful", {autoClose: 1000, type: 'success'})
         router.push('/')
     })
     .catch(e => {
         loading.value = false
-//        toast("An error has occured while signing into the website", {autoClose: 1000, type: 'error'})
-        console.log(e)
+        toast("An error has occured while signing into the website", {autoClose: 2000, type: 'error'})
     })
 }
 
 const emailRules = [
     v => !!v || 'Email is required',
     v => (v && v.length <= 64) || 'Email must be less than 64 characters',
+    v => !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
 ]
 
 

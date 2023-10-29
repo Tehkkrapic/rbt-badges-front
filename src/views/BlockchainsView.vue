@@ -8,7 +8,6 @@ const blockchains = ref([])
 onMounted(() => {
     axios.get('/api/blockchains')
     .then(response => {
-        console.log(response)
         blockchains.value = response.data.blockchains
     })
     .catch(e => {
