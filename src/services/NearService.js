@@ -1,5 +1,4 @@
 import * as nearAPI from 'near-api-js';
-import { utils } from 'near-api-js';
 const { connect } = nearAPI;
 const { Contract } = nearAPI;
 import BN from 'bn.js';
@@ -54,7 +53,8 @@ export default {
         }
       }
     
-      promises.push(account.functionCall({contractId: contract.contractId, methodName: "nft_mint", args: metadata, attachedDeposit: new BN(import.meta.env.VITE_API_MINT_DEPOSIT)}))
+      promises.push(account.functionCall({contractId: contract.contractId, methodName: "nft_mint",
+       args: metadata, attachedDeposit: new BN(import.meta.env.VITE_API_MINT_DEPOSIT)}))
     }
     return Promise.allSettled(promises)
   },
@@ -148,20 +148,15 @@ export default {
     let tokenID = options.tokenID;
 
     const contract = new Contract(
-        account, // the account object that is connecting
-        account.accountId,
+        account, account.accountId,
         {
             viewMethods: ["getMessages"], // view methods do not change state but usually return a value
             changeMethods: ["addMessage"], // change methods modify state
         }
     );
-    let metadata = {
-        account_id: account.accountId,
-        token_id: tokenID,
-        receiver_id: to,
-        amount: 1,
-    }
-    return await account.functionCall({contractId: contract.contractId, methodName: "nft_transfer", args: metadata, attachedDeposit: new BN(import.meta.env.VITE_API_SEND_DEPOSIT)})
+    let metadata = {account_id: account.accountId, token_id: tokenID, receiver_id: to, amount: 1}
+    return await account.functionCall({contractId: contract.contractId, methodName: "nft_transfer", 
+    args: metadata, attachedDeposit: new BN(import.meta.env.VITE_API_SEND_DEPOSIT)})
   },
   
   async login() {

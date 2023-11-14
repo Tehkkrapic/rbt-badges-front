@@ -170,7 +170,7 @@ watch(route, async (newVal, oldVal) => {
             </v-col>
         </v-row>
         <v-row>
-            <v-col v-for="badge in badges" :key="badge" class="d-flex child-flex" cols="12" xs="12" sm="12" md="6" lg="3">
+            <v-col v-for="badge in badges" :key="badge" class="d-flex child-flex" cols="12" xs="12" sm="12" md="6" lg="2">
                 <div class="container"> 
                     <div class="d-flex justify-space-between">
                         <p class="text-h6 text-medium-emphasis">{{ badge.name }}</p>

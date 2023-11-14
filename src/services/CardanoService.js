@@ -17,7 +17,6 @@ export default {
             }]
         });
         
-        /*
         var config = {
             method: 'post',
             url: 'https://cardano-testnet.tangocrypto.com/' + APP_ID + '/v1/nft/collections/' + COLLECTION_ID + '/tokens',
@@ -27,28 +26,8 @@ export default {
             },
             withCredentials: true,
             data : data
-          };
-          */
-         
-          
-        /*
-        axios.get('http://cardano-testnet.tangocrypto.com/fbc8dfbe8d14435bba35c906ab9d793b/v1/blocks/latest', {headers: {'x-api-key': '5886e6a5ca624441b8f2f5289f753116'}})
-        .then(response => {
-            console.log(response)
-            console.log(JSON.stringify(response.data))
-        })
-        .catch(e => {
-            console.log(e)
-        })
-        */
-        axios.post('/badges/mint', {})
-        .then(response => {
-            console.log(response)
-        })
-        .catch(e => {
-            console.log(e)
-        })
-    },
+          };     
+      },
 
 
     async getAllAssets(options) {

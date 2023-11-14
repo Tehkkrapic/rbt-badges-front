@@ -78,7 +78,8 @@ export default {
       let toAddress = options.to;
       let tokenID = parseInt(options.tokenID);
       
-      let sendTxn = algosdk.makeAssetTransferTxnWithSuggestedParams(account, toAddress, undefined, undefined, 1, undefined, tokenID, params, undefined);
+      let sendTxn = algosdk.makeAssetTransferTxnWithSuggestedParams(account, toAddress, undefined, undefined, 
+        1, undefined, tokenID, params, undefined);
       
       const singleTxnGroups = [{txn: sendTxn, signers: [account]}];
       const signedTxn = await peraWallet.signTransaction([singleTxnGroups]);
@@ -105,22 +106,8 @@ export default {
         let decimals = 0;
         let total = 1;
 
-        let mintTxn = algosdk.makeAssetCreateTxnWithSuggestedParams(
-          account, 
-          note, 
-          total, 
-          decimals, 
-          defaultFrozen, 
-          account, 
-          account, 
-          account, 
-          account, 
-          unitName, 
-          assetName + index, 
-          assetURL, 
-          assetMetadataHash, 
-          params,
-        );    
+        let mintTxn = algosdk.makeAssetCreateTxnWithSuggestedParams(account, note, total, decimals, defaultFrozen, 
+          account, account, account, account, unitName, assetName + index, assetURL, assetMetadataHash, params);    
         multipleTxnGroups.push({txn: mintTxn, signers: [account]});
       }
         
